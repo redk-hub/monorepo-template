@@ -1,0 +1,14 @@
+{
+  "name": "@my-repo/hooks",
+  "version": "1.0.0",
+  "sideEffects": false,
+  "main": "./src/index.js",
+  "module": "./src/index.js",
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "zustand": "^5.0.0"
+  },
+  "dependencies": {
+    "ahooks": "^3.9.6"
+  }
+}

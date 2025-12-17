@@ -1,0 +1,13 @@
+{
+  "name": "my-repo",
+  "private": true,
+  "scripts": {
+    "lint": "eslint \"**/*.{jsx,.js}\"",
+    "format": "prettier --write \"**/*.{jsx,.js,json,md}\""
+  },
+  "devDependencies": {
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.7.4"
+  }
+}
