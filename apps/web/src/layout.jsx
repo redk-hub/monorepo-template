@@ -8,7 +8,7 @@ import {
   Link,
   Navigate,
 } from 'react-router-dom';
-import { routes } from './router';
+import { routes } from './router/routeConfig';
 
 const { Header, Sider, Content } = Layout;
 
@@ -107,8 +107,14 @@ const LayoutWrapper = () => {
   // --- 3. 构造侧边栏菜单 ---
   const menuItems = useMemo(() => {
     const filterMenu = (list, parentPath = '') => {
-      return list
-        .filter((item) => hasPermission(item.auth))
+      const newList = list
+        .filter(
+          (item) =>
+            hasPermission(item.auth) &&
+            !!item.path &&
+            !!item.label &&
+            !item.hideInMenu,
+        )
         .map((item) => {
           const fullPath = item.path.startsWith('/')
             ? item.path
@@ -121,6 +127,8 @@ const LayoutWrapper = () => {
               : null,
           };
         });
+
+      return newList?.length ? newList : null;
     };
     return filterMenu(routes);
   }, [hasPermission]);

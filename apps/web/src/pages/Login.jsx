@@ -11,7 +11,13 @@ const LoginPage = () => {
   const handleLogin = async () => {
     // 1. 模拟请求 API
     const mockUser = { id: 1, name: '张三', avatar: 'xxx' };
-    const mockPerms = ['home:view', 'system:view', 'user:view', 'role:view'];
+    const mockPerms = [
+      'home:view',
+      'system:view',
+      'user:view',
+      'role:view',
+      'user:detail',
+    ];
 
     // 2. 更新 Store 里的值
     // 调用这个函数后，所有引用了 userInfo 或 permissions 的组件都会自动重新渲染

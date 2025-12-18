@@ -8,16 +8,15 @@ import 'antd/dist/antd.css';
 
 const App = () => {
   const setAuth = useUserStore((state) => state.setAuth);
-  console.log('app render');
   // 模拟初始化：从缓存恢复登录状态
-  // useEffect(() => {
-  //   const savedUser = localStorage.getItem('user');
-  //   const savedPerms = localStorage.getItem('permissions');
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    const savedPerms = localStorage.getItem('permissions');
 
-  //   if (savedUser && savedPerms) {
-  //     setAuth(JSON.parse(savedUser), JSON.parse(savedPerms));
-  //   }
-  // }, [setAuth]);
+    if (savedUser && savedPerms) {
+      setAuth(JSON.parse(savedUser), JSON.parse(savedPerms));
+    }
+  }, [setAuth]);
 
   return (
     <ConfigProvider locale={zhCN}>
