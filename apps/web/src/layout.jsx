@@ -1,56 +1,142 @@
-import React, { useEffect } from 'react';
-import { Layout, Menu, Tabs, Button, Dropdown } from 'antd';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Layout, Menu, Tabs, Button, Breadcrumb, message } from 'antd';
 import { useAliveController } from 'react-activation';
 import { usePermission, usePageStore } from '@my-repo/hooks'; // 统一入口引入
-import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { useNavigate, useLocation, Outlet, Link } from 'react-router-dom';
 import { routes } from './router';
 
 const { Header, Sider, Content } = Layout;
 
+/**
+ * 将嵌套路由配置拍平为面包屑映射表
+ * 输出格式: { '/home': '控制台', '/system/user': '用户列表' }
+ */
+const generateBreadcrumbMap = (routes, parentPath = '') => {
+  let map = {};
+  routes.forEach((route) => {
+    if (!route.label) return;
+    // 处理路径拼接，确保格式为 /path/subpath
+    const fullPath = route.path.startsWith('/')
+      ? route.path
+      : `${parentPath}/${route.path}`.replace(/\/+/g, '/');
+
+    // 映射名称
+    map[fullPath] = { label: route.label, clickable: !!route.element };
+
+    // 如果有子路由，递归处理
+    if (route.children) {
+      Object.assign(map, generateBreadcrumbMap(route.children, fullPath));
+    }
+  });
+  return map;
+};
+
 const LayoutWrapper = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // 从 Store 获取标签页状态
   const { tabs, addTab, closeTab } = usePageStore();
+
+  // 1. 性能优化：使用 useMemo 仅在初始化时生成一次映射表
+  const breadcrumbNameMap = useMemo(() => generateBreadcrumbMap(routes), []);
+
+  // --- 1. 侧边栏状态处理 ---
+  const [openKeys, setOpenKeys] = useState([]);
+
   const { hasPermission } = usePermission();
 
-  const { dropByCacheKey } = useAliveController();
+  const { drop, clear, getCachingNodes } = useAliveController();
 
-  // 监听路由变化：自动同步标签页
-  useEffect(() => {
-    const currentPath = location.pathname;
-    const label = routes.find((item) => item.path === currentPath)?.label;
-    addTab({ key: currentPath, label });
-  }, [location.pathname, addTab]);
+  // --- 1. 处理导航与缓存清理 ---
+  const handleNavigate = (path, isMenuClick = false) => {
+    if (!path || path === location.pathname) return;
 
-  // 处理 Tab 编辑（主要是删除）
-  const onEdit = (targetKey, action) => {
-    if (action === 'remove') {
-      // 核心：关闭 Tab 时立刻销毁 react-activation 里的缓存
-      dropByCacheKey(targetKey);
+    // 如果是通过侧边栏或面包屑“跳转”，通常希望清理旧的缓存，开启新任务
+    // 尤其是在返回上级时，清理掉当前/下级页面的缓存
+    drop(location.pathname);
 
-      // 如果关闭的是当前页，自动跳到前一个标签
-      if (targetKey === location.pathname) {
-        const currentIndex = tabs.findIndex((t) => t.key === targetKey);
-        const nextPath = tabs[currentIndex - 1]?.key || '/home';
-        navigate(nextPath);
-      }
-
-      closeTab(targetKey);
-    }
+    navigate(path);
   };
 
-  // 刷新当前页
-  const refreshPage = () => {
-    dropByCacheKey(location.pathname);
-    window.location.reload();
-  };
+  // --- 2. 动态生成面包屑 ---
+  const breadcrumbItems = useMemo(() => {
+    /**
+     * 改进后的面包屑查找函数：支持动态参数匹配
+     */
+    const findRoute = (path, map) => {
+      // 1. 精确匹配
+      if (map[path]) return map[path];
 
-  const menuItems = routes
-    .filter((item) => !item.auth || hasPermission(item.auth))
-    .map((item) => ({
-      key: item.path,
-      label: item.label,
-    }));
+      // 2. 模糊匹配 (将 :id 转换为正则)
+      const targetKey = Object.keys(map).find((key) => {
+        const regexPath = key.replace(/:[^/]+/g, '[^/]+'); // 将 :id 替换为匹配非斜杠的正则
+        return new RegExp(`^${regexPath}$`).test(path);
+      });
+      return map[targetKey];
+    };
+    // 解析当前路径片段
+    const pathSnippets = location.pathname.split('/').filter((i) => i);
+    // 生成面包屑子项
+    const breadcrumbItems = pathSnippets
+      .map((_, index) => {
+        const url = `/${pathSnippets.slice(0, index + 1).join('/')}`;
+        const isLast = index === pathSnippets.length - 1;
+        const { label, clickable } = findRoute(url, breadcrumbNameMap) || {};
+        // 如果路由配置里没写 label（比如中间层容器），则不显示或显示路径名
+        if (!label) return null;
+        return isLast || !clickable ? (
+          <Breadcrumb.Item key={url}>{label}</Breadcrumb.Item>
+        ) : (
+          <Breadcrumb.Item key={url}>
+            <Link
+              to={url}
+              onClick={() => {
+                // 核心逻辑：点击面包屑返回上级时，清理掉当前页面的缓存
+                // TODO   如果点了爷爷节点，是不是应该把父节点的缓存也清了
+                const nodes = getCachingNodes();
+                //  找出所有属于当前路径或其子路径的节点
+                // 例如：当前在 /system/user/detail/1，点击了 /system
+                // 我们需要清理掉 /system/user/detail/1 和 /system/user
+                nodes.forEach((node) => {
+                  if (node.name && node.name.startsWith(url)) {
+                    // 注意：这里逻辑上是清理“目标路径”及其下所有子路径的缓存
+                    // 确保下次点击进去时，整个链路都是新的
+                    drop(node.name);
+                  }
+                });
+              }}
+            >
+              {label}
+            </Link>
+          </Breadcrumb.Item>
+        );
+      })
+      .filter(Boolean); // 过滤掉 null
+
+    return breadcrumbItems;
+  }, [location.pathname, breadcrumbNameMap]);
+
+  // --- 3. 构造侧边栏菜单 ---
+  const menuItems = useMemo(() => {
+    const filterMenu = (list, parentPath = '') => {
+      return list
+        .filter((item) => hasPermission(item.auth))
+        .map((item) => {
+          const fullPath = item.path.startsWith('/')
+            ? item.path
+            : `${parentPath}/${item.path}`.replace(/\/+/g, '/');
+          return {
+            key: fullPath,
+            label: item.label,
+            children: item.children
+              ? filterMenu(item.children, fullPath)
+              : null,
+          };
+        });
+    };
+    return filterMenu(routes);
+  }, [hasPermission]);
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -71,8 +157,9 @@ const LayoutWrapper = () => {
           theme="dark"
           mode="inline"
           selectedKeys={[location.pathname]}
+          defaultOpenKeys={['/' + location.pathname.split('/')[1]]}
           items={menuItems}
-          onClick={({ key }) => navigate(key)}
+          onClick={({ key }) => handleNavigate(key, true)}
         />
       </Sider>
 
@@ -80,44 +167,36 @@ const LayoutWrapper = () => {
         <Header
           style={{
             background: '#fff',
-            padding: '0 16px',
+            padding: '0 24px',
             display: 'flex',
-            alignItems: 'center',
             justifyContent: 'space-between',
+            alignItems: 'center',
+            boxShadow: '0 1px 4px rgba(0,21,41,.08)',
           }}
         >
-          <div style={{ color: '#888' }}>
-            后台管理系统 /
-            {menuItems.find((item) => item.key === location.pathname)?.label ||
-              '首页'}
-          </div>
-          <Button size="small" onClick={refreshPage}>
-            刷新当前页
-          </Button>
-        </Header>
+          <Breadcrumb>{breadcrumbItems}</Breadcrumb>
 
-        {/* 3. 多标签页栏 */}
-        <div style={{ background: '#f0f2f5', padding: '10px 16px 0' }}>
-          <Tabs
-            type="editable-card"
-            hideAdd
-            activeKey={location.pathname}
-            onEdit={onEdit}
-            onChange={(key) => navigate(key)}
-            items={tabs.map((tab) => ({
-              key: tab.key,
-              label: tab.label,
-              closable: tab.key !== 'home', // 首页通常设置不可关闭
-            }))}
-          />
-        </div>
+          <div>
+            <Button
+              type="link"
+              onClick={() => {
+                clear(); // 清理所有缓存
+                message.success('缓存已清空');
+                window.location.reload();
+              }}
+            >
+              重置应用
+            </Button>
+          </div>
+        </Header>
 
         <Content
           style={{
-            margin: '0 16px 16px',
+            margin: '24px',
             padding: 24,
             background: '#fff',
             minHeight: 280,
+            borderRadius: 8,
           }}
         >
           <Outlet />

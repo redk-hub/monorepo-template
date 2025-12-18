@@ -18,5 +18,5 @@ export const usePageStore = create((set) => ({
     })),
 
   // 重置状态（退出登录时用）
-  resetAll: () => set({ tabs: [{ key: '/home', label: '仪表盘' }] }),
+  resetAll: (path) => set({ tabs: [{ key: path }] }),
 }));
