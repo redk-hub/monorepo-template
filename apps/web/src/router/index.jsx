@@ -68,30 +68,25 @@ const renderRoutes = (routes, parentPath = '') => {
       ? path
       : `${parentPath}/${path}`.replace(/\/+/g, '/');
 
-    // 封装一个内部组件，用于获取 location 并包裹功能组件
-    const PageWrapper = () => {
-      const location = useLocation();
-      return (
+    console.log('fullPath', fullPath);
+
+    return {
+      path: path,
+      element: element ? (
         <AuthGuard auth={auth}>
           <KeepAliveWrapper
             active={keepAlive}
-            cacheKey={location.pathname} // 使用当前完整路径作为缓存 Key
+            cacheKey={fullPath} // 使用当前完整路径作为缓存 Key
           >
             {element}
           </KeepAliveWrapper>
         </AuthGuard>
-      );
-    };
-
-    return {
-      path: path,
-      // 如果有页面组件，就用包装器（权限+缓存）
-      // 如果没有页面组件（它是父级路径），就必须渲染 Outlet，否则子页面显示不出来
-      element: element ? <PageWrapper /> : <Outlet />,
+      ) : (
+        <Outlet />
+      ),
       children: children ? renderRoutes(children, fullPath) : undefined,
     };
   });
-  console.log('newRoutes', newRoutes);
   return newRoutes;
 };
 
