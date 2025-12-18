@@ -8,7 +8,7 @@ import {
   Link,
   Navigate,
 } from 'react-router-dom';
-import { routes } from './router/routeConfig';
+import { routes } from '../router/routeConfig';
 
 const { Header, Sider, Content } = Layout;
 
