@@ -8,7 +8,7 @@ const List = () => {
 
   return (
     <div>
-      <h2>列表页 (KeepAlive)</h2>
+      <h2>列表页</h2>
       <Input
         value={val}
         onChange={(e) => setVal(e.target.value)}

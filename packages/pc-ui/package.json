@@ -7,7 +7,6 @@
   "peerDependencies": {
     "react": "^18.0.0",
     "antd": "^4.0.0",
-    "react-router-dom": "^7.0.0",
-    "react-activation": "^0.13.0"
+    "react-router-dom": "^7.0.0"
   }
 }

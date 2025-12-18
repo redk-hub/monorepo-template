@@ -55,7 +55,7 @@ const Home = () => {
             <b>组件复用：</b> 使用自定义 AdminLayout (位于 packages/ui)
           </li>
           <li>
-            <b>页面缓存：</b> 集成 react-activation 实现 Keep-alive
+            <b>页面结构：</b> 支持多级路由和布局组件拆分
           </li>
           <li>
             <b>权限控制：</b> 基于 usePermission 钩子实现菜单和路由过滤

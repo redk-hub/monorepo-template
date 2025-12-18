@@ -1,8 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Layout, Menu, Tabs, Button, Breadcrumb, message } from 'antd';
-import { useAliveController } from 'react-activation';
-import { usePermission, usePageStore } from '@my-repo/hooks'; // 统一入口引入
-import { useNavigate, useLocation, Outlet, Link } from 'react-router-dom';
+import { Layout, Menu, Button, Breadcrumb, message } from 'antd';
+import { usePermission, useUserStore } from '@my-repo/hooks'; // 统一入口引入
+import {
+  useNavigate,
+  useLocation,
+  Outlet,
+  Link,
+  Navigate,
+} from 'react-router-dom';
 import { routes } from './router';
 
 const { Header, Sider, Content } = Layout;
@@ -34,9 +39,12 @@ const generateBreadcrumbMap = (routes, parentPath = '') => {
 const LayoutWrapper = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  // 从 Store 获取标签页状态
-  const { tabs, addTab, closeTab } = usePageStore();
+  const isLogin = useUserStore((state) => state.isLogin);
+  // 1. 判断登录状态：如果未登录，重定向到登录页
+  // state 记录当前路径，方便登录后跳回
+  if (!isLogin) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
 
   // 1. 性能优化：使用 useMemo 仅在初始化时生成一次映射表
   const breadcrumbNameMap = useMemo(() => generateBreadcrumbMap(routes), []);
@@ -46,15 +54,13 @@ const LayoutWrapper = () => {
 
   const { hasPermission } = usePermission();
 
-  const { drop, clear, getCachingNodes } = useAliveController();
-
-  // --- 1. 处理导航与缓存清理 ---
+  // --- 1. 处理导航 ---
   const handleNavigate = (path, isMenuClick = false) => {
     if (!path || path === location.pathname) return;
 
     // 如果是通过侧边栏或面包屑“跳转”，通常希望清理旧的缓存，开启新任务
     // 尤其是在返回上级时，清理掉当前/下级页面的缓存
-    drop(location.pathname);
+    // drop(location.pathname);
 
     navigate(path);
   };
@@ -89,26 +95,7 @@ const LayoutWrapper = () => {
           <Breadcrumb.Item key={url}>{label}</Breadcrumb.Item>
         ) : (
           <Breadcrumb.Item key={url}>
-            <Link
-              to={url}
-              onClick={() => {
-                // 核心逻辑：点击面包屑返回上级时，清理掉当前页面的缓存
-                // TODO   如果点了爷爷节点，是不是应该把父节点的缓存也清了
-                const nodes = getCachingNodes();
-                //  找出所有属于当前路径或其子路径的节点
-                // 例如：当前在 /system/user/detail/1，点击了 /system
-                // 我们需要清理掉 /system/user/detail/1 和 /system/user
-                nodes.forEach((node) => {
-                  if (node.name && node.name.startsWith(url)) {
-                    // 注意：这里逻辑上是清理“目标路径”及其下所有子路径的缓存
-                    // 确保下次点击进去时，整个链路都是新的
-                    drop(node.name);
-                  }
-                });
-              }}
-            >
-              {label}
-            </Link>
+            <Link to={url}>{label}</Link>
           </Breadcrumb.Item>
         );
       })
@@ -180,8 +167,6 @@ const LayoutWrapper = () => {
             <Button
               type="link"
               onClick={() => {
-                clear(); // 清理所有缓存
-                message.success('缓存已清空');
                 window.location.reload();
               }}
             >

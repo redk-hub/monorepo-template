@@ -10,14 +10,6 @@ import { Result, Button } from 'antd';
  */
 const AuthGuard = ({ children, auth }) => {
   const { hasPermission } = usePermission();
-  const isLogin = useUserStore((state) => state.isLogin);
-  const location = useLocation();
-
-  // 1. 判断登录状态：如果未登录，重定向到登录页
-  // state 记录当前路径，方便登录后跳回
-  if (!isLogin) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
 
   // 2. 判断权限状态：如果有权限标识且校验不通过，显示 403
   if (auth && !hasPermission(auth)) {
