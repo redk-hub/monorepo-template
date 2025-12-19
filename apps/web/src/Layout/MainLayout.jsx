@@ -24,18 +24,13 @@ const LayoutWrapper = () => {
   }
 
   // --- 1. 侧边栏状态处理 ---
-  const [openKeys, setOpenKeys] = useState([]);
+  const [openMenus, setOpenMenus] = useState([]);
 
   const { hasPermission } = usePermission();
 
   // --- 1. 处理导航 ---
-  const handleNavigate = (path, isMenuClick = false) => {
+  const handleNavigate = (path) => {
     if (!path || path === location.pathname) return;
-
-    // 如果是通过侧边栏或面包屑“跳转”，通常希望清理旧的缓存，开启新任务
-    // 尤其是在返回上级时，清理掉当前/下级页面的缓存
-    // drop(location.pathname);
-
     navigate(path);
   };
 
@@ -68,6 +63,70 @@ const LayoutWrapper = () => {
     return filterMenu(routes);
   }, [hasPermission]);
 
+  // --- 4. 计算菜单选中的 key ---
+  const routeEntries = useMemo(() => {
+    const entries = [];
+    const traverse = (list, parent = '') => {
+      list.forEach((r) => {
+        if (r.index || !r.path) return;
+        const fullPath = r.path.startsWith('/')
+          ? r.path
+          : `${parent}/${r.path}`.replace(/\/+/g, '/');
+        entries.push({
+          fullPath,
+          hideInMenu: !!r.hideInMenu,
+          parent: parent || '/',
+        });
+        if (r.children) traverse(r.children, fullPath);
+      });
+    };
+    traverse(routes);
+    return entries;
+  }, [routes]);
+
+  const selectedKey = useMemo(() => {
+    const path = location.pathname;
+
+    // find candidates matching the current path (supporting params)
+    const candidates = routeEntries.filter((e) => {
+      try {
+        const pattern = e.fullPath.replace(/:[^/]+/g, '[^/]+');
+        const re = new RegExp(`^${pattern}$`);
+        return re.test(path);
+      } catch (err) {
+        return false;
+      }
+    });
+
+    // choose the most specific match (longest path)
+    let match = candidates.sort(
+      (a, b) => b.fullPath.length - a.fullPath.length,
+    )[0];
+
+    // fallback: try to match by progressively trimming the path
+    if (!match) {
+      const parts = path.split('/').filter(Boolean);
+      for (let i = parts.length; i > 0; i--) {
+        const url = '/' + parts.slice(0, i).join('/');
+        match = routeEntries.find((e) => e.fullPath === url);
+        if (match) break;
+      }
+    }
+
+    // if matched route is hidden in menu, climb to nearest visible parent
+    while (match && match.hideInMenu) {
+      match = routeEntries.find((e) => e.fullPath === match.parent);
+    }
+
+    if (match) return match.fullPath;
+
+    // last resort: select top-level segment
+    const firstSeg = '/' + location.pathname.split('/')[1];
+    return firstSeg || location.pathname;
+  }, [location.pathname, routeEntries]);
+
+  console.log('aaaaaaa', routeEntries, selectedKey);
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider collapsible>
@@ -86,10 +145,10 @@ const LayoutWrapper = () => {
         <Menu
           theme="dark"
           mode="inline"
-          selectedKeys={[location.pathname]}
+          selectedKeys={[selectedKey]}
           defaultOpenKeys={['/' + location.pathname.split('/')[1]]}
           items={menuItems}
-          onClick={({ key }) => handleNavigate(key, true)}
+          onClick={({ key }) => handleNavigate(key)}
         />
       </Sider>
 
