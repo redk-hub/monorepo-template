@@ -11,7 +11,7 @@ import { Result, Button } from 'antd';
 const AuthGuard = ({ children, auth }) => {
   const { hasPermission } = usePermission();
   console.log('auth', auth);
-  // 2. 判断权限状态：如果有权限标识且校验不通过，显示 403
+  //判断权限状态：如果有权限标识且校验不通过，显示 403
   if (auth && !hasPermission(auth)) {
     return (
       <Result
