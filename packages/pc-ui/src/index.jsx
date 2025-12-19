@@ -5,3 +5,4 @@ export const MyButton = (props) => <Button {...props} />;
 
 export * from './RouteBreadcrumb';
 export * from './RouteMenu';
+export * from './SysMenu';

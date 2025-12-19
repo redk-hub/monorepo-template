@@ -57,33 +57,73 @@ const flattenRoutes = (list, parent = '') => {
 // RouteMenu 组件
 // props:
 // - routes: 路由配置
-// 通过 usePermission 获取 hasPermission 并用于构建菜单
+// 行为调整：只展示当前顶部选中一级路由的 children（如果有），否则展示根级可见路由
 export const RouteMenu = ({ routes = [] }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { hasPermission } = usePermission();
 
-  // 点击菜单的导航处理器
-  const handleNavigate = ({ key }) => {
-    if (!key || key === location.pathname) return;
-    navigate(key);
-  };
+  // 1. 计算当前选中的顶级路径（与 SysMenu 的算法保持一致）
+  const activeTop = useMemo(() => {
+    const parts = location.pathname.split('/').filter(Boolean);
+    const first = parts.length ? `/${parts[0]}` : '/';
 
-  // menuItems: antd Menu 所需的数据结构（受权限与 hideInMenu 控制）
+    // 尝试在 routes 中找到匹配的顶级路由
+    const found = (routes || []).find((r) => {
+      const fp = r.path?.startsWith('/') ? r.path : `/${r.path}`;
+      return fp === first && hasPermission(r.auth) && !r.hideInMenu;
+    });
+
+    if (found) return `/${found.path.replace(/^\//, '')}`;
+
+    // 若未直接找到，尝试按 pattern 匹配（支持参数）
+    for (const r of routes || []) {
+      try {
+        const fp = r.path?.startsWith('/') ? r.path : `/${r.path}`;
+        const pattern = fp.replace(/:[^/]+/g, '[^/]+');
+        if (
+          new RegExp(`^${pattern}`).test(location.pathname) &&
+          hasPermission(r.auth) &&
+          !r.hideInMenu
+        ) {
+          return fp;
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    return first;
+  }, [location.pathname, routes, hasPermission]);
+
+  // 2. 根据 activeTop 找到对应的子路由用于构建侧边菜单
+  const childSource = useMemo(() => {
+    const top = (routes || []).find((r) => {
+      const fp = r.path?.startsWith('/') ? r.path : `/${r.path}`;
+      return fp === activeTop || `/${r.path}` === activeTop;
+    });
+
+    if (top && Array.isArray(top.children)) return top.children;
+
+    // 若无 top 或没有 children，则尝试展示根级路由的可见项
+    return routes;
+  }, [routes, activeTop]);
+
+  // menuItems: 仅基于 childSource 构建侧边菜单
   const menuItems = useMemo(
-    () => buildMenuItems(routes, hasPermission),
-    [routes, hasPermission],
+    () =>
+      buildMenuItems(
+        childSource || [],
+        hasPermission,
+        activeTop === '/' ? '' : activeTop,
+      ),
+    [childSource, hasPermission, activeTop],
   );
 
   // routeEntries: 扁平化后的路由表，用于匹配当前路径并向上查找可见的父路由
   const routeEntries = useMemo(() => flattenRoutes(routes), [routes]);
 
-  // selectedKey: 计算当前应该高亮的菜单 key
-  // - 首先通过正则匹配支持参数化路由（例如 /user/:id）
-  // - 选择最精确（最长路径）的匹配
-  // - 若没有直接匹配，逐级向上裁剪当前路径尝试精确匹配
-  // - 如果匹配到的路由被 hideInMenu，则向上查找最近的非 hideInMenu 父路由并选中它
-  // - 最后兜底选择首个路径段作为选中项
+  // selectedKey: 计算当前应该高亮的菜单 key（仍从整个路由表中寻找匹配，然后若匹配项在 hideInMenu 则向上寻找）
   const selectedKey = useMemo(() => {
     const path = location.pathname;
     const candidates = routeEntries.filter((e) => {
@@ -129,6 +169,11 @@ export const RouteMenu = ({ routes = [] }) => {
     if (parts.length === 0) return ['/'];
     return ['/' + parts[0]];
   }, [selectedKey]);
+
+  const handleNavigate = ({ key }) => {
+    if (!key || key === location.pathname) return;
+    navigate(key);
+  };
 
   return (
     <Menu

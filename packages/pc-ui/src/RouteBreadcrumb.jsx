@@ -37,7 +37,7 @@ const generateBreadcrumbMap = (routes, parentPath = '') => {
 // props:
 // - routes: 路由配置，用于生成面包屑映射
 // 行为：基于当前 location.pathname 渲染一组 Breadcrumb.Item
-export const RouteBreadcrumb = ({ routes = [] }) => {
+export const RouteBreadcrumb = ({ routes = [], className }) => {
   const location = useLocation();
 
   // 使用 useMemo 缓存由 routes 生成的映射，避免每次渲染都重建
@@ -89,7 +89,7 @@ export const RouteBreadcrumb = ({ routes = [] }) => {
   // 如果没有任何面包屑项则不渲染组件
   if (!breadcrumbItems || breadcrumbItems.length === 0) return null;
 
-  return <Breadcrumb>{breadcrumbItems}</Breadcrumb>;
+  return <Breadcrumb className={className}>{breadcrumbItems}</Breadcrumb>;
 };
 
 export default RouteBreadcrumb;
