@@ -6,7 +6,15 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     server: {
-      proxy: createProxy(mode)
-    }
+      proxy: createProxy(mode),
+    },
+    // add less preprocessor options so .less files are handled and Ant Design works
+    css: {
+      preprocessorOptions: {
+        less: {
+          javascriptEnabled: true,
+        },
+      },
+    },
   };
 });

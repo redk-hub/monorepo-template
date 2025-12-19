@@ -1,8 +1,9 @@
 import { Layout, Button } from 'antd';
 import { useUserStore } from '@my-repo/hooks'; // 统一入口引入
 import { useLocation, Outlet, Navigate } from 'react-router-dom';
-import { routes } from '../router/routeConfig';
+import { routes } from '../../router/routeConfig';
 import { RouteBreadcrumb, RouteMenu } from '@my-repo/pc-ui';
+import styles from './index.less';
 
 const { Header, Sider, Content } = Layout;
 
@@ -16,7 +17,7 @@ const LayoutWrapper = () => {
   }
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout className={styles.mainLayout}>
       <Sider collapsible>
         <div
           style={{
@@ -34,39 +35,19 @@ const LayoutWrapper = () => {
       </Sider>
 
       <Layout>
-        <Header
-          style={{
-            background: '#fff',
-            padding: '0 24px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            boxShadow: '0 1px 4px rgba(0,21,41,.08)',
-          }}
-        >
-          <RouteBreadcrumb routes={routes} />
+        <Header className={styles.sysMenu}>
+          {/*TODO 系统菜单 */}
 
-          <div>
-            <Button
-              type="link"
-              onClick={() => {
-                window.location.reload();
-              }}
-            >
-              重置应用
-            </Button>
+          <div style={{ marginLeft: 'auto' }}>
+            <Button type="link">个人中心</Button>
           </div>
         </Header>
 
-        <Content
-          style={{
-            margin: '24px',
-            padding: 24,
-            background: '#fff',
-            minHeight: 280,
-            borderRadius: 8,
-          }}
-        >
+        <Header className={styles.breadcrumb}>
+          <RouteBreadcrumb routes={routes} />
+        </Header>
+
+        <Content className={styles.content}>
           <Outlet />
         </Content>
       </Layout>

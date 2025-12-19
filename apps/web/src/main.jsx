@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App'; // 引入 App.js
+import App from './App';
 import { useUserStore } from '@my-repo/hooks';
 // import './index.css'; // 全局样式
 

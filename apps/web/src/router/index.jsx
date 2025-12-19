@@ -2,7 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import AuthGuard from './AuthGuard';
 import { routes } from './routeConfig';
-const Layout = lazy(() => import('../Layout/MainLayout'));
+const Layout = lazy(() => import('../Layout/MainLayout/index'));
 const Login = lazy(() => import('../pages/Login'));
 
 /**
