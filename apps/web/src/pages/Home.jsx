@@ -23,11 +23,7 @@ const Home = () => {
         </Col>
         <Col span={8}>
           <Card>
-            <Statistic
-              title="系统运行状态"
-              value="稳定"
-              valueStyle={{ color: '#3f8600' }}
-            />
+            <Statistic title="系统运行状态" value="稳定" />
           </Card>
         </Col>
         <Col span={8}>

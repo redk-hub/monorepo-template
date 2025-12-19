@@ -1,6 +1,14 @@
 .mainLayout {
   min-height: 100vh;
 
+  :global {
+    .ant-layout-sider-trigger {
+      background: #fff;
+      box-shadow: 4px 0 12px rgba(2, 12, 27, 0.06);
+      color: #403f3f !important;
+    }
+  }
+
   .sysMenu {
     width: 100%;
     background: #fff;
@@ -18,9 +26,18 @@
   }
 
   .content {
-    margin: 0 24px 24px 24px;
     padding: 24px;
     background: #fff;
     min-height: 280px;
+  }
+
+  .sider {
+    background: #fff;
+    /* shadow on the vertical edge to separate sider from content */
+    box-shadow: 4px 0 12px rgba(2, 12, 27, 0.06);
+    transition:
+      box-shadow 0.2s ease,
+      width 0.2s ease;
+    z-index: 1;
   }
 }
