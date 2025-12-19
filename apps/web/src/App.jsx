@@ -7,15 +7,15 @@ import { useUserStore } from '@my-repo/hooks'; // 引入公共 hooks 包里的 s
 import 'antd/dist/antd.css';
 
 const App = () => {
+  console.log('App render');
   const setAuth = useUserStore((state) => state.setAuth);
   // 模拟初始化：从缓存恢复登录状态
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    const savedPerms = localStorage.getItem('permissions');
-
-    if (savedUser && savedPerms) {
-      setAuth(JSON.parse(savedUser), JSON.parse(savedPerms));
-    }
+    // const savedUser = localStorage.getItem('user');
+    // const savedPerms = localStorage.getItem('permissions');
+    // if (savedUser && savedPerms) {
+    //   setAuth(JSON.parse(savedUser), JSON.parse(savedPerms));
+    // }
   }, [setAuth]);
 
   return (

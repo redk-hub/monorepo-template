@@ -1,10 +1,11 @@
 import React from 'react';
 import { Button, message } from 'antd';
 import { useUserStore } from '@my-repo/hooks'; // 从你的公共包引入
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   // 仅获取更新状态的函数 setAuth
   const setAuth = useUserStore((state) => state.setAuth);
 
@@ -25,8 +26,22 @@ const LoginPage = () => {
 
     message.success('登录成功');
 
-    // 3. 跳转到首页
-    navigate('/home');
+    // 3. 登录后跳回原先想访问的页面（如果有），否则跳到 /home
+    const rawFrom =
+      location.state && location.state.from ? location.state.from : null;
+    let to = '/home';
+    if (rawFrom) {
+      // 支持传入整个 location 对象或字符串路径
+      if (typeof rawFrom === 'string') {
+        to = rawFrom;
+      } else {
+        const pathname = rawFrom.pathname || '/home';
+        const search = rawFrom.search || '';
+        const hash = rawFrom.hash || '';
+        to = `${pathname}${search}${hash}`;
+      }
+    }
+    navigate(to, { replace: true });
   };
 
   return (

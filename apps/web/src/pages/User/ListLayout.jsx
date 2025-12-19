@@ -14,7 +14,7 @@ const ListLayout = () => {
   const isDetail = location.pathname !== '/system/user';
 
   return (
-    <div style={{ height: '100vh', position: 'relative' }}>
+    <div style={{ height: '100%', position: 'relative' }}>
       {/* 列表页：始终存在 */}
       <div
         style={{
