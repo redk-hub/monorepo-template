@@ -14,7 +14,6 @@
     "@my-repo/pc-ui": "workspace:*",
     "@my-repo/utils": "workspace:*",
     "antd": "^4.24.0",
-    "nprogress": "^0.2.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^7.10.1",
