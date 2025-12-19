@@ -8,7 +8,7 @@ const List = () => {
 
   return (
     <div>
-      <h2>列表页</h2>
+      <div style={{ fontSize: 32, marginBottom: 20 }}>列表页</div>
       <Input
         value={val}
         onChange={(e) => setVal(e.target.value)}

@@ -132,7 +132,6 @@ export const RouteMenu = ({ routes = [] }) => {
 
   return (
     <Menu
-      theme="dark"
       mode="inline"
       selectedKeys={[selectedKey]}
       defaultOpenKeys={defaultOpenKeys}
