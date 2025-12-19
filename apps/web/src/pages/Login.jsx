@@ -18,6 +18,7 @@ const LoginPage = () => {
       'user:view',
       'role:view',
       'user:detail',
+      'role:list',
     ];
 
     // 2. 更新 Store 里的值

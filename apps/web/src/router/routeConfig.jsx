@@ -1,5 +1,5 @@
 import React, { lazy } from 'react';
-
+import { Navigate, Outlet } from 'react-router-dom';
 const Home = lazy(() => import('../pages/Home'));
 const RoleList = lazy(() => import('../pages/RoleList'));
 const ListLayout = lazy(() => import('../pages/User/ListLayout'));
@@ -18,6 +18,10 @@ export const routes = [
     label: '系统管理',
     auth: 'system:view',
     children: [
+      {
+        index: true,
+        element: <Navigate to="user" replace />,
+      },
       {
         path: 'user',
         label: '用户管理',
@@ -42,7 +46,15 @@ export const routes = [
         path: 'role',
         label: '角色管理',
         auth: 'role:view',
-        element: <RoleList />,
+        children: [
+          { index: true, element: <Navigate to="list" replace /> },
+          {
+            path: 'list',
+            label: '角色列表',
+            auth: 'role:list',
+            element: <RoleList />,
+          },
+        ],
       },
     ],
   },

@@ -11,8 +11,8 @@ const Login = lazy(() => import('../pages/Login'));
  */
 const renderRoutes = (routes) => {
   const newRoutes = routes.map((route) => {
-    const { element, children, path, auth } = route;
-
+    const { element, children, path, auth, index } = route;
+    if (index) return route;
     return {
       path: path,
       element: element ? (

@@ -2,9 +2,9 @@ import { Layout, Button, Switch } from 'antd';
 import { useUserStore } from '@my-repo/hooks'; // 统一入口引入
 import { useLocation, Outlet, Navigate } from 'react-router-dom';
 import { routes } from '../../router/routeConfig';
-import { RouteBreadcrumb, RouteMenu } from '@my-repo/pc-ui';
-import { SysMenu } from '@my-repo/pc-ui';
-import { usePermission } from '@my-repo/hooks';
+import { RouteBreadcrumb, SideMenu } from '@my-repo/pc-ui';
+import { TopMenu } from '@my-repo/pc-ui';
+import { usePermission, useCurMenu } from '@my-repo/hooks';
 import styles from './index.module.less';
 
 // import theme files (global overrides for antd). These define .theme-light and .theme-dark classes
@@ -18,7 +18,7 @@ const { Header, Sider, Content } = Layout;
 const LayoutWrapper = () => {
   const location = useLocation();
   const isLogin = useUserStore((state) => state.isLogin);
-  const { hasPermission } = usePermission();
+  const { topMenuChildren } = useCurMenu(routes);
 
   // theme: 'light' or 'dark'
   const [theme, setTheme] = useState(() => {
@@ -38,33 +38,6 @@ const LayoutWrapper = () => {
       localStorage.setItem('app-theme', theme);
     } catch (e) {}
   }, [theme]);
-
-  // 判断当前顶部选中一级路由是否有可见子路由（基于权限和 hideInMenu）
-  const shouldShowSider = (() => {
-    try {
-      const parts = location.pathname.split('/').filter(Boolean);
-      const first = parts.length ? `/${parts[0]}` : '/';
-
-      // 找到对应的顶级路由对象
-      const top = (routes || []).find((r) => {
-        const fp = r.path?.startsWith('/') ? r.path : `/${r.path}`;
-        return fp === first || `/${r.path}` === first;
-      });
-
-      if (!top) return false;
-
-      if (!Array.isArray(top.children) || top.children.length === 0)
-        return false;
-
-      // 判断子路由中是否存在至少一个应该展示的项
-      const visible = top.children.some(
-        (c) => c && c.path && c.label && !c.hideInMenu && hasPermission(c.auth),
-      );
-      return visible;
-    } catch (e) {
-      return false;
-    }
-  })();
 
   // 1. 判断登录状态：如果未登录，重定向到登录页
   // state 记录当前路径，方便登录后跳回
@@ -88,7 +61,7 @@ const LayoutWrapper = () => {
           LOGO
         </div>
 
-        <SysMenu routes={routes} />
+        <TopMenu routes={routes} />
 
         <Switch
           checked={theme === 'dark'}
@@ -98,13 +71,13 @@ const LayoutWrapper = () => {
         />
       </Header>
       <Layout>
-        {shouldShowSider && (
+        {!!topMenuChildren && (
           <Sider collapsible>
-            <RouteMenu routes={routes} />
+            <SideMenu routes={routes} />
           </Sider>
         )}
         <Layout>
-          {shouldShowSider && (
+          {!!topMenuChildren && (
             <RouteBreadcrumb className={styles.breadcrumb} routes={routes} />
           )}
           <Content className={styles.content}>
