@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Layout, Menu, Button, Breadcrumb, message } from 'antd';
+import { Layout, Menu, Button, message } from 'antd';
 import { usePermission, useUserStore } from '@my-repo/hooks'; // 统一入口引入
 import {
   useNavigate,
@@ -9,32 +9,9 @@ import {
   Navigate,
 } from 'react-router-dom';
 import { routes } from '../router/routeConfig';
+import { RouteBreadcrumb } from '@my-repo/pc-ui';
 
 const { Header, Sider, Content } = Layout;
-
-/**
- * 将嵌套路由配置拍平为面包屑映射表
- * 输出格式: { '/home': '控制台', '/system/user': '用户列表' }
- */
-const generateBreadcrumbMap = (routes, parentPath = '') => {
-  let map = {};
-  routes.forEach((route) => {
-    if (!route.label) return;
-    // 处理路径拼接，确保格式为 /path/subpath
-    const fullPath = route.path.startsWith('/')
-      ? route.path
-      : `${parentPath}/${route.path}`.replace(/\/+/g, '/');
-
-    // 映射名称
-    map[fullPath] = { label: route.label, clickable: !!route.element };
-
-    // 如果有子路由，递归处理
-    if (route.children) {
-      Object.assign(map, generateBreadcrumbMap(route.children, fullPath));
-    }
-  });
-  return map;
-};
 
 const LayoutWrapper = () => {
   const navigate = useNavigate();
@@ -45,9 +22,6 @@ const LayoutWrapper = () => {
   if (!isLogin) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
-
-  // 1. 性能优化：使用 useMemo 仅在初始化时生成一次映射表
-  const breadcrumbNameMap = useMemo(() => generateBreadcrumbMap(routes), []);
 
   // --- 1. 侧边栏状态处理 ---
   const [openKeys, setOpenKeys] = useState([]);
@@ -64,45 +38,6 @@ const LayoutWrapper = () => {
 
     navigate(path);
   };
-
-  // --- 2. 动态生成面包屑 ---
-  const breadcrumbItems = useMemo(() => {
-    /**
-     * 改进后的面包屑查找函数：支持动态参数匹配
-     */
-    const findRoute = (path, map) => {
-      // 1. 精确匹配
-      if (map[path]) return map[path];
-
-      // 2. 模糊匹配 (将 :id 转换为正则)
-      const targetKey = Object.keys(map).find((key) => {
-        const regexPath = key.replace(/:[^/]+/g, '[^/]+'); // 将 :id 替换为匹配非斜杠的正则
-        return new RegExp(`^${regexPath}$`).test(path);
-      });
-      return map[targetKey];
-    };
-    // 解析当前路径片段
-    const pathSnippets = location.pathname.split('/').filter((i) => i);
-    // 生成面包屑子项
-    const breadcrumbItems = pathSnippets
-      .map((_, index) => {
-        const url = `/${pathSnippets.slice(0, index + 1).join('/')}`;
-        const isLast = index === pathSnippets.length - 1;
-        const { label, clickable } = findRoute(url, breadcrumbNameMap) || {};
-        // 如果路由配置里没写 label（比如中间层容器），则不显示或显示路径名
-        if (!label) return null;
-        return isLast || !clickable ? (
-          <Breadcrumb.Item key={url}>{label}</Breadcrumb.Item>
-        ) : (
-          <Breadcrumb.Item key={url}>
-            <Link to={url}>{label}</Link>
-          </Breadcrumb.Item>
-        );
-      })
-      .filter(Boolean); // 过滤掉 null
-
-    return breadcrumbItems;
-  }, [location.pathname, breadcrumbNameMap]);
 
   // --- 3. 构造侧边栏菜单 ---
   const menuItems = useMemo(() => {
@@ -169,7 +104,7 @@ const LayoutWrapper = () => {
             boxShadow: '0 1px 4px rgba(0,21,41,.08)',
           }}
         >
-          <Breadcrumb>{breadcrumbItems}</Breadcrumb>
+          <RouteBreadcrumb routes={routes} />
 
           <div>
             <Button
