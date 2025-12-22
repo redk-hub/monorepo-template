@@ -2,26 +2,10 @@ import { useEffect, useRef, useState, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from 'antd';
 
-export default function List({ data, setData, scrollTopRef }) {
+export default function List({ data }) {
   const navigate = useNavigate();
   const containerRef = useRef(null);
   const [val, setVal] = useState('');
-
-  // 首次加载数据
-  useEffect(() => {
-    if (data.length === 0) {
-      fetch('/api/list')
-        .then((res) => res.json())
-        .then(setData);
-    }
-  }, []);
-
-  // 每次显示时恢复滚动位置
-  useLayoutEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTop = scrollTopRef.current;
-    }
-  });
 
   return (
     <div ref={containerRef}>

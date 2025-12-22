@@ -77,7 +77,6 @@ export const SideMenu = ({ routes = [] }) => {
 
   // routeEntries: 扁平化后的路由表，用于匹配当前路径并向上查找可见的父路由
   const routeEntries = useMemo(() => flattenRoutes(routes), [routes]);
-  console.log('routeEntries', routeEntries);
 
   // selectedKey: 计算当前应该高亮的菜单 key（仍从整个路由表中寻找匹配，然后若匹配项在 hideInMenu 则向上寻找）
   const selectedKey = useMemo(() => {
@@ -114,8 +113,6 @@ export const SideMenu = ({ routes = [] }) => {
 
     return keys;
   }, [selectedKey, routeEntries]);
-
-  console.log('selectedKey', selectedKey, defaultOpenKeys, menuItems);
 
   const handleNavigate = ({ key }) => {
     if (!key || key === location.pathname) return;

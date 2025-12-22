@@ -1,16 +1,19 @@
 import { Layout } from 'antd';
 import { useUserStore } from '@my-repo/hooks'; // 统一入口引入
-import { useLocation, Outlet, Navigate } from 'react-router-dom';
+import { useLocation, Outlet, Navigate, useNavigate } from 'react-router-dom';
 import { routes } from '../../router/routeConfig';
 import { RouteBreadcrumb, SideMenu } from '@my-repo/pc-ui';
 import { TopMenu } from '@my-repo/pc-ui';
 import { useCurMenu } from '@my-repo/hooks';
 import styles from './index.module.less';
+import { useEffect } from 'react';
+import { setNavigateLogin } from '@my-repo/utils';
 
 const { Header, Sider, Content } = Layout;
 
 const LayoutWrapper = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isLogin = useUserStore((state) => state.isLogin);
   const { topMenuChildren } = useCurMenu(routes);
 
@@ -19,6 +22,12 @@ const LayoutWrapper = () => {
   if (!isLogin) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
+
+  useEffect(() => {
+    setNavigateLogin(() =>
+      navigate('/login', { state: { from: location }, replace: true }),
+    );
+  }, []);
 
   return (
     <Layout className={styles.mainLayout}>
