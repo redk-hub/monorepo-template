@@ -5,18 +5,14 @@ import { fetchUsersInfinite } from './api';
 
 export default function Infinite() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteQuery(
-      ['users-infinite'],
-      ({ pageParam = 1 }) => fetchUsersInfinite({ pageParam }),
-      {
-        getNextPageParam: (lastPage) => {
-          const totalPages = Math.ceil(lastPage.total / 5);
-          return lastPage.nextPage <= totalPages
-            ? lastPage.nextPage
-            : undefined;
-        },
+    useInfiniteQuery({
+      queryKey: ['users-infinite'],
+      queryFn: ({ pageParam = 1 }) => fetchUsersInfinite({ pageParam }),
+      getNextPageParam: (lastPage) => {
+        const totalPages = Math.ceil(lastPage.total / 5);
+        return lastPage.nextPage <= totalPages ? lastPage.nextPage : undefined;
       },
-    );
+    });
 
   if (isLoading) return <div>加载中（Infinite）...</div>;
 

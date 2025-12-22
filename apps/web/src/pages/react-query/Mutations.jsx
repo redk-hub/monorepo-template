@@ -7,17 +7,19 @@ export default function Mutations() {
   const queryClient = useQueryClient();
   const [name, setName] = useState('新用户');
 
-  const create = useMutation(createUser, {
+  const create = useMutation({
+    mutationFn: createUser,
     onSuccess: () => {
       message.success('创建成功，已刷新列表');
-      queryClient.invalidateQueries(['users']);
+      queryClient.invalidateQueries({ queryKey: ['users'] });
     },
   });
 
-  const update = useMutation(updateUser, {
+  const update = useMutation({
+    mutationFn: updateUser,
     onMutate: async (variables) => {
-      await queryClient.cancelQueries(['users']);
-      const previous = queryClient.getQueriesData(['users']);
+      await queryClient.cancelQueries({ queryKey: ['users'] });
+      const previous = queryClient.getQueriesData({ queryKey: ['users'] });
       queryClient.setQueryData(['users', { page: 1, size: 5 }], (old) => {
         if (!old) return old;
         return {
@@ -38,7 +40,7 @@ export default function Mutations() {
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries(['users']);
+      queryClient.invalidateQueries({ queryKey: ['users'] });
     },
   });
 
@@ -51,7 +53,10 @@ export default function Mutations() {
           onChange={(e) => setName(e.target.value)}
           style={{ width: 200 }}
         />
-        <Button onClick={() => create.mutate({ name })} loading={create.isLoading}>
+        <Button
+          onClick={() => create.mutate({ name })}
+          loading={create.isLoading}
+        >
           创建用户
         </Button>
       </Space>
@@ -66,5 +71,3 @@ export default function Mutations() {
     </div>
   );
 }
-
-

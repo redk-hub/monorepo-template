@@ -26,9 +26,8 @@ mock.onGet('/api/users').reply((config) => {
 
 // GET /api/users/:id
 mock.onGet(new RegExp('/api/users/\\d+$')).reply((config) => {
-  const match = config.url.match(/\/api\/users\/(\\d+)$/);
-  const id = Number(match[1]);
-  const user = USERS.find((u) => u.id === id);
+  const id = config.url.split('/').pop();
+  const user = USERS.find((u) => u.id == id);
   if (!user) return [404, err('用户不存在')];
   return [200, ok(user)];
 });

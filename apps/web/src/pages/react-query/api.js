@@ -27,5 +27,3 @@ export const fetchUsersInfinite = async ({ pageParam = 1 }) => {
   });
   return { data: res.list, nextPage: res.page + 1, total: res.total };
 };
-
-

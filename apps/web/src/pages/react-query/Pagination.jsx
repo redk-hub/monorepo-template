@@ -6,13 +6,11 @@ import { fetchUsers } from './api';
 export default function Pagination() {
   const [page, setPage] = useState(1);
   const size = 5;
-  const { data, isFetching } = useQuery(
-    ['users', { page, size }],
-    fetchUsers,
-    {
-      keepPreviousData: true,
-    },
-  );
+  const { data, isFetching } = useQuery({
+    queryKey: ['users', { page, size }],
+    queryFn: fetchUsers,
+    keepPreviousData: true,
+  });
 
   return (
     <div>
@@ -42,5 +40,3 @@ export default function Pagination() {
     </div>
   );
 }
-
-

@@ -17,9 +17,6 @@ const DependentParallel = lazy(
 const PrefetchInvalidate = lazy(
   () => import('../pages/react-query/PrefetchInvalidate'),
 );
-const SuspenseExample = lazy(
-  () => import('../pages/react-query/SuspenseExample'),
-);
 
 // 路由配置表
 export const routes = [
@@ -49,11 +46,6 @@ export const routes = [
         path: 'prefetch',
         label: '预取与失效',
         element: <PrefetchInvalidate />,
-      },
-      {
-        path: 'suspense',
-        label: 'Suspense 示例',
-        element: <SuspenseExample />,
       },
     ],
     auth: null,

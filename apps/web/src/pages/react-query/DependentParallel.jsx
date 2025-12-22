@@ -7,18 +7,38 @@ import { request } from '@my-repo/utils';
 export default function DependentParallel() {
   const [selectedId, setSelectedId] = useState(1);
 
-  const userQuery = useQuery(
-    ['user', selectedId],
-    () => fetchUser(selectedId),
-    {
-      enabled: !!selectedId,
-    },
-  );
+  const userQuery = useQuery({
+    queryKey: ['user', selectedId],
+    queryFn: () => fetchUser(selectedId),
+    enabled: !!selectedId,
+  });
 
-  const listQuery = useQuery(['users', { page: 1, size: 3 }], fetchUsers);
-  const extraQuery = useQuery(['users-extra'], () =>
-    request.get('/api/users?size=2&page=3'),
-  );
+  const listQuery = useQuery({
+    queryKey: ['users', { page: 1, size: 3 }],
+    queryFn: fetchUsers,
+  });
+  const extraQuery = useQuery({
+    queryKey: ['users-extra'],
+    queryFn: () => request.get('/api/users?size=2&page=3'),
+  });
+
+  const renderUser = () => {
+    if (userQuery.isLoading) return '加载中...';
+    if (userQuery.isError) return '请求出错';
+    return userQuery.data?.name || '无数据';
+  };
+
+  const renderListCount = () => {
+    if (listQuery.isLoading) return '加载中';
+    if (listQuery.isError) return '请求出错';
+    return listQuery.data?.list?.length ?? 0;
+  };
+
+  const renderExtraCount = () => {
+    if (extraQuery.isLoading) return '加载中';
+    if (extraQuery.isError) return '请求出错';
+    return extraQuery.data?.list?.length ?? 0;
+  };
 
   return (
     <div>
@@ -31,19 +51,13 @@ export default function DependentParallel() {
       </div>
       <div>
         <strong>依赖查询（user）：</strong>
-        <div>{userQuery.isLoading ? '加载中...' : userQuery.data?.name}</div>
+        <div>{renderUser()}</div>
       </div>
       <div style={{ marginTop: 8 }}>
         <strong>并行查询（两个列表）：</strong>
-        <div>
-          list: {listQuery.isLoading ? '加载中' : listQuery.data.list.length}
-        </div>
-        <div>
-          extra: {extraQuery.isLoading ? '加载中' : extraQuery.data.list.length}
-        </div>
+        <div>list: {renderListCount()}</div>
+        <div>extra: {renderExtraCount()}</div>
       </div>
     </div>
   );
 }
-
-

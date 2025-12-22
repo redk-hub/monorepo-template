@@ -7,12 +7,15 @@ export default function PrefetchInvalidate() {
   const queryClient = useQueryClient();
 
   const prefetch = async () => {
-    await queryClient.prefetchQuery(['user', 1], () => fetchUser(1));
+    await queryClient.prefetchQuery({
+      queryKey: ['user', 1],
+      queryFn: () => fetchUser(1),
+    });
     message.success('已预取 user/1');
   };
 
   const invalidate = () => {
-    queryClient.invalidateQueries(['users']);
+    queryClient.invalidateQueries({ queryKey: ['users'] });
     message.success('已使 users 查询失效');
   };
 
@@ -26,5 +29,3 @@ export default function PrefetchInvalidate() {
     </div>
   );
 }
-
-

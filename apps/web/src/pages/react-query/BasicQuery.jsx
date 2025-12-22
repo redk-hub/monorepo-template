@@ -4,10 +4,10 @@ import { List } from 'antd';
 import { fetchUsers } from './api';
 
 export default function BasicQuery() {
-  const { data, isLoading, isError } = useQuery(
-    ['users', { page: 1, size: 5 }],
-    fetchUsers,
-  );
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['users', { page: 1, size: 5 }],
+    queryFn: fetchUsers,
+  });
 
   if (isLoading) return <div>加载中（BasicQuery）...</div>;
   if (isError) return <div>请求出错（BasicQuery）</div>;
@@ -26,5 +26,3 @@ export default function BasicQuery() {
     </div>
   );
 }
-
-
