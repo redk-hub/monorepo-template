@@ -14,7 +14,7 @@ const { Header, Sider, Content } = Layout;
 const LayoutWrapper = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const isLogin = useUserStore((state) => state.isLogin);
+  const isLogin = useUserStore((state) => !!state.userInfo);
   const { topMenuChildren } = useCurMenu(routes);
 
   useEffect(() => {

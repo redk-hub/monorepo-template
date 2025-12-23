@@ -16,7 +16,7 @@ const LayoutWrapper = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const matches = useMatches();
-  const isLogin = useUserStore((state) => state.isLogin);
+  const isLogin = useUserStore((state) => !!state.userInfo);
   useEffect(() => {
     setNavigateLogin(() =>
       navigate('/login', { state: { from: location }, replace: true }),
