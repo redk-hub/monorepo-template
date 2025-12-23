@@ -75,11 +75,13 @@ my-repo/
 - **React 18** - 用户界面构建
 - **Vite** - 构建工具和开发服务器
 - **React Router** - 客户端路由
+- **zustand** - 状态管理
 - **React Query** - 数据获取和状态管理
 
 ### 数据管理
 
-- **React Query (TanStack Query)** - 强大的数据同步和缓存管理
+- **zustand** - 轻量级状态管理,持久化支持,存储客户端操作状态
+- **React Query (TanStack Query)** - 强大的数据同步和缓存管理，处理服务端数据
 - **axios-mock-adapter** - HTTP 请求模拟和测试工具
 
 ### 开发工具
