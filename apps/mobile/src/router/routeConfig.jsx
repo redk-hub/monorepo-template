@@ -1,5 +1,5 @@
 import React, { lazy } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 const Home = lazy(() => import('../pages/Home'));
 const ListLayout = lazy(() => import('../pages/User/ListLayout'));
 const UserDetail = lazy(() => import('../pages/User/Detail'));
@@ -10,20 +10,18 @@ export const routes = [
   { index: true, element: <Navigate to="home" replace /> },
   {
     path: 'home',
-    label: '首页',
+    handle: { title: '首页' },
     element: <Home />,
-    auth: 'home:view',
   },
   {
     path: 'message',
-    label: '首页',
+    handle: { title: '消息' },
     element: <Message />,
-    auth: 'message:view',
   },
   {
     path: 'system',
-    label: '系统管理',
-    auth: 'system:view',
+    handle: { title: '个人中心' },
+    element: <Outlet />,
     children: [
       {
         index: true,
@@ -32,7 +30,6 @@ export const routes = [
       {
         path: 'user',
         label: '用户管理',
-        auth: 'user:view',
         element: <ListLayout />,
         children: [
           {
@@ -42,8 +39,6 @@ export const routes = [
           {
             label: '用户详情',
             path: ':id',
-            auth: 'user:detail',
-            hideInMenu: true,
             element: <UserDetail />,
           },
         ],

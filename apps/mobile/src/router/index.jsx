@@ -1,32 +1,9 @@
 import React, { Suspense, lazy } from 'react';
-import { createHashRouter, Navigate, Outlet } from 'react-router-dom';
-import AuthGuard from './AuthGuard';
+import { createHashRouter } from 'react-router-dom';
 import { Result, Button } from 'antd-mobile';
 import { routes } from './routeConfig';
 const Layout = lazy(() => import('../Layout/MainLayout/index'));
 const Login = lazy(() => import('../pages/Login'));
-
-/**
- * 递归处理路由配置
- * 将自定义属性转换为 React Router 标准格式，并注入守卫等逻辑
- */
-const renderRoutes = (routes) => {
-  const newRoutes = routes.map((route) => {
-    const { element, children, path, auth, index } = route;
-    if (index) return route;
-    return {
-      path: path,
-      element: element ? (
-        <AuthGuard auth={auth}>{element}</AuthGuard>
-      ) : (
-        <Outlet />
-      ),
-
-      children: children ? renderRoutes(children) : undefined,
-    };
-  });
-  return newRoutes;
-};
 
 // 简单的路由错误边界，使用 react-router 的 useRouteError
 //eslint-disable-next-line
@@ -54,10 +31,7 @@ export const router = createHashRouter([
     ),
     // 根路由错误边界
     errorElement: <RouteErrorBoundary />,
-    children: [
-      ...renderRoutes(routes),
-      // { index: true, element: <Navigate to="/login" replace /> },
-    ],
+    children: routes,
   },
   {
     path: '/login',

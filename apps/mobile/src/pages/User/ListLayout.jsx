@@ -1,7 +1,6 @@
 import { Outlet, useLocation } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import List from './List';
-import { request } from '@my-repo/utils';
 
 const ListLayout = () => {
   const location = useLocation();
@@ -9,25 +8,11 @@ const ListLayout = () => {
   // 1️⃣ 列表数据
   const [list, setList] = useState([]);
 
-  useEffect(() => {
-    queryData().then((data) => {
-      setList(data);
-    });
-    request
-      .get('/api/users')
-      .then((data) => {
-        console.log('用户数据：', data);
-      })
-      .catch((error) => {
-        debugger;
-      });
-  }, []);
-
   const queryData = () => {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(
-          Array.from({ length: 20 }).map((_, i) => ({
+          Array.from({ length: 50 }).map((_, i) => ({
             id: `${i + 1}`,
             name: `用户 ${i + 1}`,
           })),
@@ -35,6 +20,12 @@ const ListLayout = () => {
       }, 500);
     });
   };
+
+  useEffect(() => {
+    queryData().then((data) => {
+      setList(data);
+    });
+  }, []);
 
   const isDetail = location.pathname !== '/system/user';
 

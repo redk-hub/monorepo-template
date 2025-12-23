@@ -21,7 +21,7 @@ const LayoutWrapper = () => {
     setNavigateLogin(() =>
       navigate('/login', { state: { from: location }, replace: true }),
     );
-  }, []);
+  }, [location]);
 
   // 1. 判断登录状态：如果未登录，重定向到登录页
   // state 记录当前路径，方便登录后跳回
