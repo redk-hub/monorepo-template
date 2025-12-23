@@ -17,17 +17,17 @@ const LayoutWrapper = () => {
   const isLogin = useUserStore((state) => state.isLogin);
   const { topMenuChildren } = useCurMenu(routes);
 
-  // 1. 判断登录状态：如果未登录，重定向到登录页
-  // state 记录当前路径，方便登录后跳回
-  if (!isLogin) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-
   useEffect(() => {
     setNavigateLogin(() =>
       navigate('/login', { state: { from: location }, replace: true }),
     );
   }, []);
+
+  // 1. 判断登录状态：如果未登录，重定向到登录页
+  // state 记录当前路径，方便登录后跳回
+  if (!isLogin) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
 
   return (
     <Layout className={styles.mainLayout}>

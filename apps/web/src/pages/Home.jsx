@@ -31,7 +31,7 @@ const Home = () => {
             <Button
               type="primary"
               block
-              onClick={() => window.open('https://ant.design')}
+              onClick={() => window.open('https://4x.ant.design/index-cn')}
             >
               查看 AntD 文档
             </Button>

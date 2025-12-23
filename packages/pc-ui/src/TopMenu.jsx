@@ -48,7 +48,7 @@ export const TopMenu = ({ routes = [] }) => {
     if (!key) return;
     if (key === 'logout') {
       logout();
-      navigate('/login', { replace: true });
+      // navigate('/login', { replace: true });
       return;
     }
     navigate(key);
