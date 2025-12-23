@@ -18,14 +18,14 @@ export const useUserStore = create(
         });
       },
 
-      // 2. 局部更新：只更新头像或昵称
+      // 局部更新：只更新头像或昵称
       updateUser: (newInfo) =>
         set((state) => {
           const newUser = { ...state.userInfo, ...newInfo };
           return { userInfo: newUser };
         }),
 
-      // 3. 重置：退出登录
+      //  重置：退出登录
       logout: () => {
         set({
           userInfo: null,
@@ -35,12 +35,13 @@ export const useUserStore = create(
     }),
     {
       name: STORAGE_KEY,
-      // Persist only userInfo and permissions;
+      // 只持久化 userInfo、permissions;
       partialize: (state) => ({
         userInfo: state.userInfo,
         permissions: state.permissions,
       }),
       getStorage: () => localStorage,
+      version: 1, // 当修改了数据结构，避免程序崩溃，可以设置版本号
     },
   ),
 );
