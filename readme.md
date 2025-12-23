@@ -1,6 +1,8 @@
 # Monorepo 前端项目
 
 一个基于 pnpm workspace 的现代化前端 monorepo 项目，采用模块化架构设计，包含主 Web 应用和多个可复用包。
+![alt text](/preview/image.png)
+![alt text](/preview/image2.png)
 
 ## 🚀 项目优势
 

@@ -48,13 +48,16 @@ const Home = () => {
             <b>状态管理：</b> 使用 Zustand (位于 packages/hooks)
           </li>
           <li>
-            <b>组件复用：</b> 使用自定义 AdminLayout (位于 packages/ui)
+            <b>组件复用：</b> packages/pc-ui & packages/mobile-ui
           </li>
           <li>
             <b>页面结构：</b> 支持多级路由和布局组件拆分
           </li>
           <li>
             <b>权限控制：</b> 基于 usePermission 钩子实现菜单和路由过滤
+          </li>
+          <li>
+            <b>数据获取：</b> React Query (TanStack Query)
           </li>
         </ul>
       </Card>

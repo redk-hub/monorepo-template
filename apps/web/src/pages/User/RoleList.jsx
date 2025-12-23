@@ -9,11 +9,7 @@ const List = () => {
   return (
     <div>
       <div style={{ fontSize: 32, marginBottom: 20 }}>列表页</div>
-      <Input
-        value={val}
-        onChange={(e) => setVal(e.target.value)}
-        placeholder="输入内容切换菜单再回来，内容依然在"
-      />
+      <Input value={val} onChange={(e) => setVal(e.target.value)} />
     </div>
   );
 };
