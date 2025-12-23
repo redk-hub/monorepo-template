@@ -1,16 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button, List } from 'antd';
 import { fetchUsers } from './api';
+import { useNavigate } from 'react-router-dom';
 
 export default function Pagination() {
-  const [page, setPage] = useState(1);
+  const navigate = useNavigate();
+
+  const [page, setPage] = useState(() => {
+    return Number(sessionStorage.getItem('last_page')) || 1;
+  }); // 什么清除last_page？
   const size = 5;
   const { data, isFetching } = useQuery({
     queryKey: ['users', { page, size }],
     queryFn: fetchUsers,
     keepPreviousData: true,
   });
+
+  // 监听 page 变化并记录
+  useEffect(() => {
+    sessionStorage.setItem('last_page', String(page));
+  }, [page]);
 
   return (
     <div>
@@ -33,6 +43,7 @@ export default function Pagination() {
         size="small"
         bordered
         dataSource={data?.list || []}
+        onClick={() => navigate(`/system/user/${1}`)}
         renderItem={(item) => (
           <List.Item>{`${item.id} - ${item.name}`}</List.Item>
         )}

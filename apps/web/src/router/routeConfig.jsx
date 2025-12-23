@@ -20,6 +20,7 @@ const PrefetchInvalidate = lazy(
 
 // 路由配置表
 export const routes = [
+  { index: true, element: <Navigate to="home" replace /> },
   {
     path: 'home',
     label: '首页',

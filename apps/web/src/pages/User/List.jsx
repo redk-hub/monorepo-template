@@ -4,11 +4,10 @@ import { Input } from 'antd';
 
 export default function List({ data }) {
   const navigate = useNavigate();
-  const containerRef = useRef(null);
   const [val, setVal] = useState('');
 
   return (
-    <div ref={containerRef}>
+    <div>
       <Input
         value={val}
         onChange={(e) => setVal(e.target.value)}

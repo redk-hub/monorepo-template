@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import {
   createBrowserRouter,
+  createHashRouter,
   Navigate,
   Outlet,
   useRouteError,
@@ -50,7 +51,7 @@ function RouteErrorBoundary() {
   );
 }
 
-export const router = createBrowserRouter([
+export const router = createHashRouter([
   {
     path: '/',
     element: (

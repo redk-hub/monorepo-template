@@ -5,6 +5,7 @@ import { createProxy } from './proxy';
 export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
+    base: './',
     server: {
       proxy: createProxy(mode),
     },
