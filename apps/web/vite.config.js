@@ -7,9 +7,13 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     base: './',
     server: {
+      cors: true,
+      port: 3000,
       proxy: createProxy(mode),
     },
-    // add less preprocessor options so .less files are handled and Ant Design works
+    resolve: {
+      alias: { '@': '/src' },
+    },
     css: {
       preprocessorOptions: {
         less: {
