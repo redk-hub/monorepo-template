@@ -9,5 +9,11 @@
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.7.4"
+  },
+  "pnpm": {
+    "overrides": {
+      "react": "^18.0.0",
+      "react-dom": "^18.0.0"
+    }
   }
 }

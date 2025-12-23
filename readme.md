@@ -92,7 +92,7 @@ my-repo/
 
 ### 环境要求
 
-- Node.js 18+
+- Node.js 22+
 - pnpm 7+
 
 ### 安装依赖
