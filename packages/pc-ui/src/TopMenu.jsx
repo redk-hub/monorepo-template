@@ -15,11 +15,16 @@ export const TopMenu = ({ routes = [] }) => {
   const topItems = useMemo(() => {
     const list = (routes || [])
       .filter(
-        (r) => r && r.path && r.label && !r.hideInMenu && hasPermission(r.auth),
+        (r) =>
+          r &&
+          r.path &&
+          r?.handle?.title &&
+          !r.hideInMenu &&
+          hasPermission(r.auth),
       )
       .map((r) => {
         const fullPath = r.path.startsWith('/') ? r.path : `/${r.path}`;
-        return { key: fullPath, label: r.label };
+        return { key: fullPath, label: r.handle.title };
       });
 
     // 用户信息放右侧，不参与选中

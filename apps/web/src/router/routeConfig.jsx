@@ -23,29 +23,41 @@ export const routes = [
   { index: true, element: <Navigate to="home" replace /> },
   {
     path: 'home',
-    label: '首页',
+    handle: { title: '首页' },
     element: <Home />,
     auth: 'home:view',
   },
   {
     path: 'react-query',
-    label: 'React Query 示例',
+    handle: { title: 'React Query 示例' },
     // no element -> render children via Outlet
     children: [
       { index: true, element: <Navigate to="basic" replace /> },
       { path: '', element: <RQIndex /> },
-      { path: 'basic', label: '基础查询', element: <BasicQuery /> },
-      { path: 'mutations', label: '变更与乐观更新', element: <Mutations /> },
-      { path: 'pagination', label: '分页', element: <Pagination /> },
-      { path: 'infinite', label: '无限分页', element: <Infinite /> },
+      { path: 'basic', handle: { title: '基础查询' }, element: <BasicQuery /> },
+      {
+        path: 'mutations',
+        handle: { title: '变更与乐观更新' },
+        element: <Mutations />,
+      },
+      {
+        path: 'pagination',
+        handle: { title: '分页' },
+        element: <Pagination />,
+      },
+      {
+        path: 'infinite',
+        handle: { title: '无限分页' },
+        element: <Infinite />,
+      },
       {
         path: 'dependent-parallel',
-        label: '依赖与并行',
+        handle: { title: '依赖与并行' },
         element: <DependentParallel />,
       },
       {
         path: 'prefetch',
-        label: '预取与失效',
+        handle: { title: '预取与失效' },
         element: <PrefetchInvalidate />,
       },
     ],
@@ -53,7 +65,7 @@ export const routes = [
   },
   {
     path: 'system',
-    label: '系统管理',
+    handle: { title: '系统管理' },
     auth: 'system:view',
     children: [
       {
@@ -62,7 +74,7 @@ export const routes = [
       },
       {
         path: 'user',
-        label: '用户管理',
+        handle: { title: '用户管理' },
         auth: 'user:view',
         element: <ListLayout />,
         children: [
@@ -71,7 +83,7 @@ export const routes = [
             element: null, // 列表由 Layout 自己渲染
           },
           {
-            label: '用户详情',
+            handle: { title: '用户详情' },
             path: ':id',
             auth: 'user:detail',
             hideInMenu: true,
@@ -82,13 +94,13 @@ export const routes = [
 
       {
         path: 'role',
-        label: '角色管理',
+        handle: { title: '角色管理' },
         auth: 'role:view',
         children: [
           { index: true, element: <Navigate to="list" replace /> },
           {
             path: 'list',
-            label: '角色列表',
+            handle: { title: '角色列表' },
             auth: 'role:list',
             element: <RoleList />,
           },

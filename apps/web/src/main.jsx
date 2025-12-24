@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { useUserStore } from '@my-repo/hooks';
+import './index.less';
 
 if (import.meta.env.MODE === 'development') {
   // 导入 mock 接口（仅在开发/演示中使用）

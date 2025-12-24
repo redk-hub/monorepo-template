@@ -55,7 +55,7 @@ const LayoutWrapper = () => {
         )}
         <Layout>
           {!!topMenuChildren && (
-            <RouteBreadcrumb className={styles.breadcrumb} routes={routes} />
+            <RouteBreadcrumb className={styles.breadcrumb} />
           )}
           <Content className={styles.content}>
             <Outlet />

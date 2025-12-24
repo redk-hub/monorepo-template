@@ -16,7 +16,7 @@ const buildMenuItems = (list, hasPermission, parent = '') => {
       (item) =>
         hasPermission(item.auth) &&
         !!item.path &&
-        !!item.label &&
+        !!item.handle?.title &&
         !item.hideInMenu,
     )
     .map((item) => {
@@ -25,7 +25,7 @@ const buildMenuItems = (list, hasPermission, parent = '') => {
         : `${parent}/${item.path}`.replace(/\/+/g, '/');
       return {
         key: fullPath,
-        label: item.label,
+        label: item.handle.title,
         children: item.children
           ? buildMenuItems(item.children, hasPermission, fullPath)
           : null,
